@@ -1,0 +1,4 @@
+gradio>=4.44,<5.0
+huggingface_hub<0.26
+openai>=1.40
+python-dotenv>=1.0
