@@ -53,12 +53,18 @@ def call_llm(
     temperature: float = 0.8,
 ) -> str:
     client = _get_client(provider)
-    response = client.chat.completions.create(
-        model=model,
-        temperature=temperature,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-    )
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            temperature=temperature,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+        )
+    except Exception as e:
+        cfg = _PROVIDER_CONFIG[provider]
+        raise RuntimeError(
+            f"[provider={provider} model={model} env_var={cfg['api_key_env']}] {e}"
+        ) from e
     return (response.choices[0].message.content or "").strip()
