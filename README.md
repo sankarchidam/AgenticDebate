@@ -1,12 +1,14 @@
 ---
-title: AI Debate Arena
-emoji: 🎤
-colorFrom: blue
-colorTo: red
+title: AgenticDebate
+emoji: 📊
+colorFrom: yellow
+colorTo: pink
 sdk: gradio
-sdk_version: 4.44.0
+sdk_version: 6.20.0
+python_version: '3.13'
 app_file: app.py
 pinned: false
+short_description: 4 low-cost models debate a user-given topic, judged by a 5th
 ---
 
 # AI Debate Arena
