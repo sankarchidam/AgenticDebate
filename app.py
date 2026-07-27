@@ -26,14 +26,20 @@ def run(topic, side_a_position, side_b_position):
 
     try:
         for event_type, payload in run_debate(topic, side_a_position, side_b_position):
-            if event_type == "turn":
+            if event_type == "rejected":
+                log += (
+                    f"### 🚫 Topic not allowed\n\n{payload['reason']}\n\n"
+                    "Please choose a different, lawful and non-harmful topic."
+                )
+            elif event_type == "turn":
                 model = AGENT_CONFIG[payload["agent"]]["model"]
                 tag = AGENT_TAG.get(payload["agent"], payload["agent"])
                 log += f"**{tag}** _(via {model})_: {payload['text']}\n\n"
             else:
-                log += f"---\n\n### 🏛️ Judge's Verdict\n\n{payload['text']}\n"
+                model = AGENT_CONFIG["JUDGE"]["model"]
+                log += f"---\n\n### ⚖️ Judge's Verdict _(via {model}, uninvolved in the debate)_\n\n{payload['text']}\n"
             yield log
-    except RuntimeError as e:
+    except Exception as e:
         log += f"\n\n**Error:** {e}\n\nCheck that the relevant API key is set (see `.env.example`)."
         yield log
 

@@ -17,7 +17,8 @@ judges the winner.
 
 - **A1 / A2** — Side A debaters
 - **B1 / B2** — Side B debaters
-- **JUDGE** — reads the full transcript and declares a winner
+- **JUDGE** — reads the full transcript and declares a winner; never argues,
+  never speaks during the debate, and always runs on a model no debater uses
 
 Turn order: `A1 -> B1 -> A2 -> B2 -> A1 -> B1 -> JUDGE`. Debater 1 on each
 side opens and closes; debater 2 argues the middle turn. Every debater turn
@@ -35,11 +36,36 @@ there:
 | A2 | OpenRouter | `meta-llama/llama-3.1-8b-instruct:free` |
 | B1 | Gemini | `gemini-2.5-flash` |
 | B2 | OpenAI | `gpt-5.4-mini` |
-| JUDGE | Gemini | `gemini-2.5-flash` |
+| JUDGE | DeepSeek | `deepseek-chat` |
 
-All four providers are called through the OpenAI-compatible chat-completions
+All five providers are called through the OpenAI-compatible chat-completions
 API (`debate/providers.py`), so adding a new provider is just a new
 `base_url` + API key entry.
+
+**Judge neutrality:** the judge is intentionally on a provider/model that no
+debater uses (DeepSeek, while debaters use Groq/OpenRouter/Gemini/OpenAI). If
+you change `AGENT_CONFIG`, keep that non-overlap — a judge sharing a model
+with one of the debaters isn't neutral.
+
+## Guardrails
+
+- **Topic screening** (`check_topic_allowed` in `debate/engine.py`): before
+  any debater or judge runs, the topic is checked by a fast model against
+  `GUARDRAIL_SYSTEM` in `debate/agents.py`. Topics that would require arguing
+  in favor of something illegal or clearly immoral (e.g. child labor,
+  slavery, genocide, terrorism) are rejected outright — ordinary
+  controversial-but-legal topics (minimum wage, school uniforms, etc.) are
+  allowed. A rejected topic never reaches the debaters.
+- **Debater conduct** (`CONTENT_POLICY` in `debate/agents.py`, injected into
+  every debater's system prompt): professional and courteous tone only, no
+  unethical/racial/discriminatory language, claims must be based on publicly
+  verifiable facts (no fabricated statistics), no emotionally manipulative
+  rhetoric or statements aimed at swaying sentiment toward/against any
+  community or group, and strict relevance to the topic.
+- **Judging rubric** (`JUDGE_RUBRIC` in `debate/agents.py`): the judge scores
+  in this fixed order — (1) rebuttal quality against the opponent's actual
+  points, (2) factual accuracy, (3) topical relevance, then (4) an explicit
+  explanation of how and why the winner was chosen.
 
 ## Setup
 
@@ -57,6 +83,11 @@ if you're not using OpenRouter, for example, you can leave
 - Groq free tier: https://console.groq.com
 - Gemini free tier: https://aistudio.google.com/apikey
 - OpenRouter free models: https://openrouter.ai/models?max_price=0
+- DeepSeek: https://platform.deepseek.com/api_keys (if you'd rather not hold
+  a separate DeepSeek key, point `JUDGE` in `AGENT_CONFIG` at an OpenRouter
+  free DeepSeek model instead, e.g. `deepseek/deepseek-chat-v3.1:free` with
+  `"provider": "openrouter"` — just make sure it stays distinct from
+  whichever debater is already on OpenRouter)
 
 ## Deploying to Hugging Face Spaces
 
@@ -64,6 +95,6 @@ if you're not using OpenRouter, for example, you can leave
 2. Push this repo to the Space's git remote (the `README.md` frontmatter
    above already declares `app_file: app.py`, so no extra config needed).
 3. In the Space's **Settings -> Repository secrets**, add whichever of
-   `GROQ_API_KEY` / `GEMINI_API_KEY` / `OPENROUTER_API_KEY` / `OPENAI_API_KEY`
-   your `AGENT_CONFIG` uses — these become environment variables at runtime,
-   same as `.env` locally.
+   `GROQ_API_KEY` / `GEMINI_API_KEY` / `OPENROUTER_API_KEY` / `OPENAI_API_KEY` /
+   `DEEPSEEK_API_KEY` your `AGENT_CONFIG` uses — these become environment
+   variables at runtime, same as `.env` locally.

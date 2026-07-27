@@ -21,6 +21,10 @@ _PROVIDER_CONFIG = {
         "base_url": None,
         "api_key_env": "OPENAI_API_KEY",
     },
+    "deepseek": {
+        "base_url": "https://api.deepseek.com",
+        "api_key_env": "DEEPSEEK_API_KEY",
+    },
 }
 
 _clients = {}
