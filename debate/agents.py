@@ -10,7 +10,7 @@ MAX_SENTENCES = 5
 # exists in providers._PROVIDER_CONFIG plus a valid model name for it.
 AGENT_CONFIG = {
     "A1": {"provider": "groq", "model": "llama-3.3-70b-versatile", "side": "A"},
-    "A2": {"provider": "openrouter", "model": "meta-llama/llama-3.1-8b-instruct:free", "side": "A"},
+    "A2": {"provider": "openrouter", "model": "openai/gpt-oss-20b:free", "side": "A"},
     "B1": {"provider": "gemini", "model": "gemini-2.5-flash", "side": "B"},
     "B2": {"provider": "openai", "model": "gpt-5.4-mini", "side": "B"},
     "JUDGE": {"provider": "deepseek", "model": "deepseek-chat", "side": None},

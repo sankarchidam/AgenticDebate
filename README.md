@@ -35,7 +35,7 @@ there:
 | Agent | Provider | Model |
 |-------|----------|-------|
 | A1 | Groq | `llama-3.3-70b-versatile` |
-| A2 | OpenRouter | `meta-llama/llama-3.1-8b-instruct:free` |
+| A2 | OpenRouter | `openai/gpt-oss-20b:free` |
 | B1 | Gemini | `gemini-2.5-flash` |
 | B2 | OpenAI | `gpt-5.4-mini` |
 | JUDGE | DeepSeek | `deepseek-chat` |
@@ -84,12 +84,16 @@ if you're not using OpenRouter, for example, you can leave
 
 - Groq free tier: https://console.groq.com
 - Gemini free tier: https://aistudio.google.com/apikey
-- OpenRouter free models: https://openrouter.ai/models?max_price=0
+- OpenRouter free models: `curl -s https://openrouter.ai/api/v1/models | jq -r '.data[] | select(.id | endswith(":free")) | .id'`
+  — the free-tier lineup changes often (a Llama free slug used here previously
+  got retired mid-project), so re-run that check rather than trusting a
+  hardcoded slug. Currently uses `openai/gpt-oss-20b:free` for A2.
 - DeepSeek: https://platform.deepseek.com/api_keys (if you'd rather not hold
-  a separate DeepSeek key, point `JUDGE` in `AGENT_CONFIG` at an OpenRouter
-  free DeepSeek model instead, e.g. `deepseek/deepseek-chat-v3.1:free` with
-  `"provider": "openrouter"` — just make sure it stays distinct from
-  whichever debater is already on OpenRouter)
+  a separate DeepSeek key, point `JUDGE` in `AGENT_CONFIG` at whatever
+  DeepSeek-family `:free` slug OpenRouter currently lists, `"provider":
+  "openrouter"` — just make sure it stays distinct from whichever debater is
+  already on OpenRouter, and check the live list above first since availability
+  varies)
 
 ## Deploying to Hugging Face Spaces
 

@@ -16,7 +16,7 @@ load_dotenv()
 PROBE_MODEL = {
     "groq": "llama-3.3-70b-versatile",
     "gemini": "gemini-2.5-flash",
-    "openrouter": "meta-llama/llama-3.1-8b-instruct:free",
+    "openrouter": "openai/gpt-oss-20b:free",
     "openai": "gpt-5.4-mini",
     "deepseek": "deepseek-chat",
 }
