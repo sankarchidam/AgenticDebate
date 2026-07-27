@@ -53,11 +53,18 @@ with gr.Blocks(title="AI Debate Arena") as demo:
     with gr.Row():
         topic_in = gr.Textbox(label="Debate topic", placeholder="e.g. Should homework be banned?", scale=2)
     with gr.Row():
-        side_a_in = gr.Textbox(label="Side A position", value="For")
-        side_b_in = gr.Textbox(label="Side B position", value="Against")
+        side_a_in = gr.Dropdown(choices=["For", "Against"], value="For", label="Side A position")
+        side_b_in = gr.Dropdown(
+            choices=["For", "Against"], value="Against", label="Side B position (auto-set to the opposite)",
+            interactive=False,
+        )
     run_btn = gr.Button("Start Debate", variant="primary")
     output = gr.Markdown()
 
+    def flip(side_a_position):
+        return "Against" if side_a_position == "For" else "For"
+
+    side_a_in.change(flip, inputs=side_a_in, outputs=side_b_in)
     run_btn.click(run, inputs=[topic_in, side_a_in, side_b_in], outputs=output)
 
 if __name__ == "__main__":
