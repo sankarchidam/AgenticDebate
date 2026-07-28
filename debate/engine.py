@@ -41,10 +41,15 @@ def check_topic_allowed(topic: str) -> tuple[bool, str]:
     return False, reason or "This topic is not appropriate for debate (immoral or illegal)."
 
 
-def run_debate(topic: str, side_a_position: str, side_b_position: str):
+def run_debate(topic: str, side_a_position: str, side_b_position: str, agent_config: dict = None):
     """Generator yielding ('rejected', {...}) and stopping if the topic fails
     the guardrail check; otherwise ('turn', {...}) for each debater turn,
-    then ('verdict', {...}) once at the end."""
+    then ('verdict', {...}) once at the end.
+
+    agent_config lets a caller (e.g. the Gradio UI) reassign which provider
+    plays each role for this run, via agents.build_agent_config() -- role
+    behavior below is unchanged no matter what's passed in."""
+    agent_config = agent_config or AGENT_CONFIG
     allowed, reason = check_topic_allowed(topic)
     if not allowed:
         yield ("rejected", {"reason": reason})
@@ -54,7 +59,7 @@ def run_debate(topic: str, side_a_position: str, side_b_position: str):
     positions = {"A": side_a_position, "B": side_b_position}
 
     for agent_id in TURN_ORDER:
-        cfg = AGENT_CONFIG[agent_id]
+        cfg = agent_config[agent_id]
         side = cfg["side"]
         is_opening = not any(t["agent"] == agent_id for t in transcript)
         history = format_transcript(transcript)
@@ -82,7 +87,7 @@ def run_debate(topic: str, side_a_position: str, side_b_position: str):
         transcript.append(turn)
         yield ("turn", turn)
 
-    judge_cfg = AGENT_CONFIG["JUDGE"]
+    judge_cfg = agent_config["JUDGE"]
     judge_system = (
         f'You are an impartial debate judge evaluating a debate on: "{topic}". '
         f"Side A argued: '{side_a_position}'. Side B argued: '{side_b_position}'. "

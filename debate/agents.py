@@ -2,19 +2,58 @@ import re
 
 MAX_SENTENCES = 5
 
-# Each of the 4 debaters is a different low/no-cost provider on purpose --
-# this is meant as an exercise in comparing cheap models against each other.
-# JUDGE deliberately uses a provider/model that NO debater uses (DeepSeek) --
-# a judge that shares a model with one of the debaters is not neutral.
-# Swap models/providers freely; call_llm() only needs a provider key that
-# exists in providers._PROVIDER_CONFIG plus a valid model name for it.
-AGENT_CONFIG = {
-    "A1": {"provider": "groq", "model": "llama-3.3-70b-versatile", "side": "A"},
-    "A2": {"provider": "openrouter", "model": "openai/gpt-oss-20b:free", "side": "A"},
-    "B1": {"provider": "gemini", "model": "gemini-2.5-flash", "side": "B"},
-    "B2": {"provider": "openai", "model": "gpt-5.4-mini", "side": "B"},
-    "JUDGE": {"provider": "deepseek", "model": "deepseek-chat", "side": None},
+# --- Roles vs. models -------------------------------------------------------
+# A "role" (A1/A2/B1/B2/JUDGE) is a fixed job: which side it argues (or none,
+# for the judge), and where it sits in TURN_ORDER. That never changes.
+# A "model" is just which provider executes that role -- purely swappable,
+# which is the whole point of this project (see build_agent_config below).
+
+ROLE_SIDE = {"A1": "A", "A2": "A", "B1": "B", "B2": "B", "JUDGE": None}
+
+# One representative free/cheap model per provider. Swap these, or add new
+# providers to providers._PROVIDER_CONFIG, without touching any role logic
+# in engine.py -- roles and responsibilities are defined once, independent
+# of which model plays them.
+PROVIDER_DEFAULT_MODEL = {
+    "groq": "llama-3.3-70b-versatile",
+    "gemini": "gemini-2.5-flash",
+    "openrouter": "openai/gpt-oss-20b:free",
+    "openai": "gpt-5.4-mini",
+    "deepseek": "deepseek-chat",
 }
+
+# Which provider plays which role by default. JUDGE deliberately gets a
+# provider no debater uses -- a judge that shares a model with one of the
+# debaters is not neutral. The Gradio UI lets this be reassigned per run;
+# build_agent_config() is how a role -> provider mapping becomes the full
+# role -> {provider, model, side} config run_debate() actually uses.
+DEFAULT_ROLE_PROVIDER = {
+    "A1": "groq",
+    "A2": "openrouter",
+    "B1": "gemini",
+    "B2": "openai",
+    "JUDGE": "deepseek",
+}
+
+
+def build_agent_config(role_provider: dict) -> dict:
+    """Turn a {role: provider} mapping into the full {role: {provider, model,
+    side}} config run_debate() needs. This is the single seam where "who
+    plays this role" gets decided -- everything else (prompts, turn order,
+    conduct policy, judging rubric) is provider-agnostic."""
+    return {
+        role: {
+            "provider": provider,
+            "model": PROVIDER_DEFAULT_MODEL[provider],
+            "side": ROLE_SIDE[role],
+        }
+        for role, provider in role_provider.items()
+    }
+
+
+# Default config, used whenever a caller doesn't supply its own role->provider
+# mapping (e.g. check_keys.py, or run_debate() with no override).
+AGENT_CONFIG = build_agent_config(DEFAULT_ROLE_PROVIDER)
 
 # Debater 1 on each side opens and closes; debater 2 argues the middle turn.
 TURN_ORDER = ["A1", "B1", "A2", "B2", "A1", "B1"]
