@@ -35,7 +35,7 @@ there:
 | Agent | Provider | Model |
 |-------|----------|-------|
 | A1 | Groq | `openai/gpt-oss-120b` |
-| A2 | OpenRouter | `openai/gpt-oss-20b:free` |
+| A2 | OpenRouter | `nvidia/nemotron-3-ultra-550b-a55b:free` |
 | B1 | Gemini | `gemini-2.5-flash` |
 | B2 | OpenAI | `gpt-5.4-mini` |
 | JUDGE | DeepSeek | `deepseek-chat` |
@@ -87,7 +87,7 @@ if you're not using OpenRouter, for example, you can leave
 - OpenRouter free models: `curl -s https://openrouter.ai/api/v1/models | jq -r '.data[] | select(.id | endswith(":free")) | .id'`
   — the free-tier lineup changes often (a Llama free slug used here previously
   got retired mid-project), so re-run that check rather than trusting a
-  hardcoded slug. Currently uses `openai/gpt-oss-20b:free` for A2.
+  hardcoded slug. Currently uses `nvidia/nemotron-3-ultra-550b-a55b:free` for A2.
 - DeepSeek: https://platform.deepseek.com/api_keys (if you'd rather not hold
   a separate DeepSeek key, point `JUDGE` in `AGENT_CONFIG` at whatever
   DeepSeek-family `:free` slug OpenRouter currently lists, `"provider":
