@@ -12,7 +12,7 @@ from .providers import call_llm
 # Fast/cheap model used only to screen the topic itself -- not a debate
 # participant, so reusing a debater's provider here is fine.
 GUARDRAIL_PROVIDER = "groq"
-GUARDRAIL_MODEL = "llama-3.3-70b-versatile"
+GUARDRAIL_MODEL = "openai/gpt-oss-120b"
 
 
 def format_transcript(transcript):

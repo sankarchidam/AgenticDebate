@@ -14,7 +14,7 @@ load_dotenv()
 
 # One cheap/fast model per provider, just to confirm the key + endpoint work.
 PROBE_MODEL = {
-    "groq": "llama-3.3-70b-versatile",
+    "groq": "openai/gpt-oss-120b",
     "gemini": "gemini-2.5-flash",
     "openrouter": "openai/gpt-oss-20b:free",
     "openai": "gpt-5.4-mini",

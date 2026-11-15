@@ -34,7 +34,7 @@ there:
 
 | Agent | Provider | Model |
 |-------|----------|-------|
-| A1 | Groq | `llama-3.3-70b-versatile` |
+| A1 | Groq | `openai/gpt-oss-120b` |
 | A2 | OpenRouter | `openai/gpt-oss-20b:free` |
 | B1 | Gemini | `gemini-2.5-flash` |
 | B2 | OpenAI | `gpt-5.4-mini` |
